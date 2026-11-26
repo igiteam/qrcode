@@ -189,9 +189,6 @@
     <button id="clear-btn" class="btn-secondary" title="Clear grid">Clear</button>
   </div>
 
-  <div id="error" class="error"></div>
-  <div id="status" class="status"></div>
-
   <div id="grid-wrap">
     <div class="empty-state">
       <strong>Enter a URL</strong> and press <strong>Generate QR grid</strong> to see multiple designs.
@@ -202,6 +199,9 @@
     <button id="download-btn" disabled>⬇ Download grid as PNG</button>
     <button id="download-single" class="btn-outline" disabled>⬇ Download first QR only</button>
   </div>
+
+  <div id="error" class="error"></div>
+   <div id="status" class="status"></div>
 </div>
 
 <script>
@@ -387,7 +387,7 @@
 
       downloadBtn.disabled = false;
       downloadSingle.disabled = false;
-      setStatus("");
+      setStatus("✅ " + designs.length + " designs ready — download as PNG.");
       currentUrl = url;
     } catch (err) {
       console.error(err);
