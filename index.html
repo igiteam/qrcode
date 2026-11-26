@@ -493,11 +493,28 @@
     clearError();
     setStatus("");
     urlInput.value = "https://github.com/igiteam/qrcode";
+    // clear URL query param
+    const base = window.location.pathname;
+    window.history.replaceState({}, "", base);
+  }
+
+  // Get URL from query string ?url=
+  function getUrlFromQuery() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get("url") || "";
+  }
+
+  // Update the browser URL query string to reflect the current input
+  function updateQueryParam(url) {
+    const base = window.location.pathname;
+    const newSearch = "?url=" + encodeURIComponent(url);
+    window.history.replaceState({}, "", base + newSearch);
   }
 
   generateBtn.addEventListener("click", function () {
     const url = urlInput.value.trim();
     if (!url) { showError("Please enter a URL or text."); return; }
+    updateQueryParam(url);
     renderGrid(url);
   });
 
@@ -509,13 +526,32 @@
   downloadSingle.addEventListener("click", downloadSingleQR);
   clearBtn.addEventListener("click", clearGrid);
 
+  // On load: if ?url= is present, use it; otherwise use the default input value
   window.addEventListener("load", function () {
+    const queryUrl = getUrlFromQuery();
+    if (queryUrl) {
+      urlInput.value = queryUrl;
+      // Do NOT update the query param — it's already there
+    }
+    // Wait a tick for QRCode lib to be ready
     setTimeout(function () {
-      if (urlInput.value.trim()) renderGrid(urlInput.value.trim());
+      const urlToRender = queryUrl || urlInput.value.trim();
+      if (urlToRender) {
+        renderGrid(urlToRender);
+      }
     }, 200);
   });
 
-  window.__qrGrid = { renderGrid, downloadGrid, safeFilenameFromUrl };
+  // Also respond to back/forward navigation
+  window.addEventListener("popstate", function () {
+    const queryUrl = getUrlFromQuery();
+    if (queryUrl && queryUrl !== currentUrl) {
+      urlInput.value = queryUrl;
+      renderGrid(queryUrl);
+    }
+  });
+
+  window.__qrGrid = { renderGrid, downloadGrid, safeFilenameFromUrl, getUrlFromQuery, updateQueryParam };
 })();
 </script>
 </body>
