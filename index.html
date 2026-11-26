@@ -6,19 +6,15 @@
   <title>QR Grid · multi‑design QR generator</title>
   <meta name="description" content="Generate a grid of QR codes with different designs and download as PNG. Filename derived from the input URL.">
   <meta name="theme-color" content="#0d1117">
-
-  <!-- Favicon / icon -->
   <link rel="icon" type="image/png" href="https://raw.githubusercontent.com/igiteam/qrcode/refs/heads/main/qrcode.png">
   <link rel="apple-touch-icon" href="https://raw.githubusercontent.com/igiteam/qrcode/refs/heads/main/qrcode.png">
-
-  <!-- Open Graph -->
   <meta property="og:type" content="website">
   <meta property="og:title" content="QR Grid · multi‑design QR generator">
   <meta property="og:description" content="Generate a grid of QR codes with different designs and download as PNG.">
   <meta property="og:image" content="https://raw.githubusercontent.com/igiteam/qrcode/refs/heads/main/qrcode.png">
 
-  <!-- QR code library (qrcode.js via CDN) -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  <!-- ✅ Reliable QR library that exposes a global `QRCode` -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 
   <style>
     :root {
@@ -48,7 +44,6 @@
         --card-shadow: 0 1px 3px rgba(0,0,0,0.3);
       }
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
     body {
@@ -62,74 +57,29 @@
       flex-direction: column;
       align-items: center;
     }
-
-    .app {
-      max-width: 1100px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    /* ---- header ---- */
+    .app { max-width: 1100px; width: 100%; margin: 0 auto; }
     .header {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-      flex-wrap: wrap;
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 20px; flex-wrap: wrap;
     }
     .header img {
-      width: 40px;
-      height: 40px;
-      border-radius: 8px;
-      background: var(--panel);
-      padding: 2px;
-      border: 1px solid var(--border);
+      width: 40px; height: 40px; border-radius: 8px;
+      background: var(--panel); padding: 2px; border: 1px solid var(--border);
     }
-    .header h1 {
-      font-size: 20px;
-      font-weight: 600;
-      letter-spacing: -0.01em;
-    }
-    .header h1 a {
-      color: inherit;
-      text-decoration: none;
-    }
+    .header h1 { font-size: 20px; font-weight: 600; letter-spacing: -0.01em; }
+    .header h1 a { color: inherit; text-decoration: none; }
     .header h1 a:hover { text-decoration: underline; }
-    .header .sub {
-      color: var(--sub);
-      font-size: 12px;
-      margin-left: 4px;
-    }
-
-    /* ---- input bar ---- */
+    .header .sub { color: var(--sub); font-size: 12px; margin-left: 4px; }
     .input-bar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 10px 14px;
-      margin-bottom: 20px;
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 8px; padding: 10px 14px; margin-bottom: 20px;
     }
-    .input-bar label {
-      font-weight: 600;
-      font-size: 12px;
-      color: var(--sub);
-      white-space: nowrap;
-    }
+    .input-bar label { font-weight: 600; font-size: 12px; color: var(--sub); white-space: nowrap; }
     .input-bar input {
-      flex: 1 1 300px;
-      min-width: 200px;
-      font: inherit;
-      font-size: 13px;
-      padding: 8px 12px;
-      background: var(--bg);
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      outline: none;
+      flex: 1 1 300px; min-width: 200px; font: inherit; font-size: 13px;
+      padding: 8px 12px; background: var(--bg); color: var(--text);
+      border: 1px solid var(--border); border-radius: 6px; outline: none;
       transition: border-color 0.15s;
     }
     .input-bar input:focus {
@@ -137,172 +87,101 @@
       box-shadow: 0 0 0 2px rgba(35,134,54,0.2);
     }
     .input-bar button {
-      font: inherit;
-      font-size: 13px;
-      font-weight: 500;
-      padding: 8px 18px;
-      background: var(--accent);
-      color: #fff;
-      border: 1px solid var(--accent);
-      border-radius: 6px;
-      cursor: pointer;
-      transition: background 0.15s, opacity 0.15s;
-      white-space: nowrap;
+      font: inherit; font-size: 13px; font-weight: 500;
+      padding: 8px 18px; background: var(--accent); color: #fff;
+      border: 1px solid var(--accent); border-radius: 6px;
+      cursor: pointer; transition: background 0.15s, opacity 0.15s; white-space: nowrap;
     }
     .input-bar button:hover { background: var(--accent-bg); border-color: var(--accent-bg); }
     .input-bar button:disabled { opacity: 0.5; cursor: not-allowed; }
     .input-bar .btn-secondary {
-      background: var(--btn-bg);
-      color: var(--text);
-      border-color: var(--border);
+      background: var(--btn-bg); color: var(--text); border-color: var(--border);
     }
     .input-bar .btn-secondary:hover { background: var(--btn-hover); border-color: var(--border); }
-
-    /* ---- grid ---- */
     #grid-wrap {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-      gap: 16px;
-      margin: 16px 0 24px;
-      min-height: 160px;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 16px; margin: 16px 0 24px; min-height: 160px;
     }
     @media (max-width: 480px) {
       #grid-wrap { grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 12px; }
     }
-
     .qr-card {
-      background: var(--panel);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 10px 10px 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      box-shadow: var(--card-shadow);
-      transition: transform 0.1s, border-color 0.2s;
+      background: var(--panel); border: 1px solid var(--border);
+      border-radius: 10px; padding: 10px 10px 12px;
+      display: flex; flex-direction: column; align-items: center;
+      box-shadow: var(--card-shadow); transition: transform 0.1s, border-color 0.2s;
       position: relative;
     }
-    .qr-card:hover {
-      border-color: var(--accent);
+    .qr-card:hover { border-color: var(--accent); }
+    .qr-card .qr-holder {
+      width: 100%; aspect-ratio: 1 / 1;
+      display: flex; align-items: center; justify-content: center;
+      background: #fff; border-radius: 4px; overflow: hidden;
     }
-    .qr-card canvas,
-    .qr-card img {
-      width: 100%;
-      height: auto;
-      aspect-ratio: 1 / 1;
-      border-radius: 4px;
-      display: block;
-      background: #fff;
+    .qr-card .qr-holder img,
+    .qr-card .qr-holder canvas {
+      width: 100% !important; height: 100% !important;
+      display: block; object-fit: contain;
     }
     .qr-card .label {
-      font-size: 10px;
-      color: var(--sub);
-      margin-top: 6px;
-      text-align: center;
-      font-weight: 500;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      opacity: 0.8;
+      font-size: 10px; color: var(--sub); margin-top: 6px;
+      text-align: center; font-weight: 500;
+      letter-spacing: 0.02em; text-transform: uppercase; opacity: 0.8;
     }
-
-    /* ---- status / error ---- */
     .status {
-      font-size: 12px;
-      color: var(--sub);
-      padding: 4px 0;
-      min-height: 20px;
-      width: 100%;
-      text-align: center;
+      font-size: 12px; color: var(--sub); padding: 4px 0;
+      min-height: 20px; width: 100%; text-align: center;
     }
     .error {
-      background: #ffebe9;
-      border: 1px solid #ff818266;
-      border-radius: 6px;
-      padding: 10px 14px;
-      color: #cf222e;
-      white-space: pre-wrap;
-      font-size: 12px;
-      width: 100%;
-      margin: 10px 0;
-      display: none;
+      background: #ffebe9; border: 1px solid #ff818266;
+      border-radius: 6px; padding: 10px 14px; color: #cf222e;
+      white-space: pre-wrap; font-size: 12px; width: 100%;
+      margin: 10px 0; display: none;
     }
     .error.show { display: block; }
     @media (prefers-color-scheme: dark) {
       .error { background: #3d1d1d; border-color: #f85149; color: #ffa198; }
     }
-
-    /* ---- download button (floating) ---- */
     .download-bar {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin: 12px 0 8px;
-      flex-wrap: wrap;
+      display: flex; justify-content: center; gap: 12px;
+      margin: 12px 0 8px; flex-wrap: wrap;
     }
     .download-bar button {
-      font: inherit;
-      font-size: 14px;
-      font-weight: 600;
-      padding: 12px 36px;
-      border-radius: 8px;
-      border: 1px solid var(--accent);
-      background: var(--accent);
-      color: #fff;
-      cursor: pointer;
+      font: inherit; font-size: 14px; font-weight: 600;
+      padding: 12px 36px; border-radius: 8px;
+      border: 1px solid var(--accent); background: var(--accent);
+      color: #fff; cursor: pointer;
       transition: background 0.15s, transform 0.1s;
       box-shadow: var(--card-shadow);
     }
     .download-bar button:hover { background: var(--accent-bg); border-color: var(--accent-bg); }
     .download-bar button:active { transform: scale(0.97); }
     .download-bar button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-      transform: none;
+      opacity: 0.5; cursor: not-allowed; transform: none;
     }
     .download-bar .btn-outline {
-      background: transparent;
-      color: var(--text);
-      border-color: var(--border);
-      box-shadow: none;
+      background: transparent; color: var(--text);
+      border-color: var(--border); box-shadow: none;
     }
     .download-bar .btn-outline:hover { background: var(--btn-hover); }
-
-    /* ---- empty state ---- */
     .empty-state {
-      grid-column: 1 / -1;
-      text-align: center;
-      color: var(--sub);
-      padding: 48px 16px;
-      font-size: 14px;
-      border: 2px dashed var(--border);
-      border-radius: 12px;
+      grid-column: 1 / -1; text-align: center; color: var(--sub);
+      padding: 48px 16px; font-size: 14px;
+      border: 2px dashed var(--border); border-radius: 12px;
       background: var(--panel);
     }
     .empty-state strong { color: var(--text); }
-
-    /* small flash animation for copy */
-    @keyframes flash {
-      0% { background: var(--accent); }
-      100% { background: var(--accent); }
-    }
-    .flash { animation: flash 0.6s ease; }
-
-    /* helper */
-    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
   </style>
 </head>
 <body>
 
 <div class="app">
-
-  <!-- header with provided icon -->
   <div class="header">
     <img src="https://raw.githubusercontent.com/igiteam/qrcode/refs/heads/main/qrcode.png" alt="QR icon" width="40" height="40">
     <h1><a href="#" id="home-link">QR Grid</a></h1>
     <span class="sub">multi‑design QR codes → one PNG</span>
   </div>
 
-  <!-- URL input + generate -->
   <div class="input-bar">
     <label for="url-input">URL or text:</label>
     <input id="url-input" type="text" placeholder="https://example.com/path?q=1" value="https://github.com/igiteam/qrcode" spellcheck="false" autocomplete="off">
@@ -310,30 +189,25 @@
     <button id="clear-btn" class="btn-secondary" title="Clear grid">Clear</button>
   </div>
 
-  <!-- error / status -->
   <div id="error" class="error"></div>
   <div id="status" class="status"></div>
 
-  <!-- QR grid -->
   <div id="grid-wrap">
     <div class="empty-state">
       <strong>Enter a URL</strong> and press <strong>Generate QR grid</strong> to see multiple designs.
     </div>
   </div>
 
-  <!-- download bar -->
   <div class="download-bar">
     <button id="download-btn" disabled>⬇ Download grid as PNG</button>
     <button id="download-single" class="btn-outline" disabled>⬇ Download first QR only</button>
   </div>
-
 </div>
 
 <script>
 (function () {
   "use strict";
 
-  // ----- DOM refs -----
   const urlInput       = document.getElementById("url-input");
   const generateBtn    = document.getElementById("generate-btn");
   const clearBtn       = document.getElementById("clear-btn");
@@ -343,12 +217,10 @@
   const errorEl        = document.getElementById("error");
   const statusEl       = document.getElementById("status");
 
-  // ----- state -----
   let currentUrl = "";
-  let qrCanvases = [];      // store { canvas, label } for each design
+  let qrCanvases = [];   // { canvas, label, design }
   let isRendering = false;
 
-  // ----- helper: show error -----
   function showError(msg) {
     errorEl.textContent = "⚠ " + msg;
     errorEl.classList.add("show");
@@ -361,100 +233,147 @@
     statusEl.textContent = msg || "";
   }
 
-  // ----- filename sanitizer (keeps letters, numbers, dots, dashes, underscores, and encodes special chars) -----
+  // Sanitize input → safe filename
   function safeFilenameFromUrl(input) {
     if (!input || input.trim() === "") return "qrcode-grid.png";
     let cleaned = input.trim();
-    // Remove protocol (http://, https://, ftp://, etc.)
-    cleaned = cleaned.replace(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//, "");
-    // Remove leading www.
-    cleaned = cleaned.replace(/^www\./i, "");
-    // Replace characters that are problematic in filenames: / \ : * ? " < > | & = % # + @ etc.
-    // We keep alphanumerics, dot, dash, underscore. Encode others as %XX or just replace with _.
-    // But we want something readable, so replace spaces with underscore, and encode the rest.
-    cleaned = cleaned.replace(/[\s]+/g, "_");           // spaces -> underscore
-    cleaned = cleaned.replace(/[^a-zA-Z0-9._-]/g, (ch) => {
-      // For common safe-ish characters, encode as %XX to keep the info but stay filesystem-safe.
-      const code = ch.charCodeAt(0).toString(16).toUpperCase();
-      return "%" + code.padStart(2, "0");
+    cleaned = cleaned.replace(/^[a-zA-Z][a-zA-Z0-9+.-]*:\/\//, ""); // drop scheme
+    cleaned = cleaned.replace(/^www\./i, "");                       // drop www.
+    cleaned = cleaned.replace(/[\s]+/g, "_");                       // spaces → _
+    cleaned = cleaned.replace(/[^a-zA-Z0-9._-]/g, function (ch) {
+      return "%" + ch.charCodeAt(0).toString(16).toUpperCase().padStart(2, "0");
     });
-    // Collapse multiple underscores
     cleaned = cleaned.replace(/_+/g, "_");
-    // Trim leading/trailing underscores and dots
     cleaned = cleaned.replace(/^[_.]+|[_.]+$/g, "");
-    // Limit length to avoid overly long filenames
     if (cleaned.length > 120) cleaned = cleaned.slice(0, 120);
     if (cleaned === "") cleaned = "qrcode";
     return cleaned + ".png";
   }
 
-  // ----- generate multiple QR designs (using qrcode.js) -----
-  // We'll produce 6 different styles (colors, error correction, margin, etc.)
+  // Designs
   const designs = [
-    { label: "Classic",       opts: { color: { dark: "#000000", light: "#ffffff" }, errorCorrectionLevel: "M", margin: 2 } },
-    { label: "Blue",          opts: { color: { dark: "#1a73e8", light: "#ffffff" }, errorCorrectionLevel: "M", margin: 1 } },
-    { label: "High contrast", opts: { color: { dark: "#0d1117", light: "#f0f6fc" }, errorCorrectionLevel: "H", margin: 2 } },
-    { label: "Dark green",    opts: { color: { dark: "#1a7f37", light: "#ffffff" }, errorCorrectionLevel: "Q", margin: 1 } },
-    { label: "Purple",        opts: { color: { dark: "#6f42c1", light: "#faf5ff" }, errorCorrectionLevel: "M", margin: 1 } },
-    { label: "Red",           opts: { color: { dark: "#cf222e", light: "#fff5f5" }, errorCorrectionLevel: "H", margin: 2 } },
-    { label: "Minimal",       opts: { color: { dark: "#111111", light: "#ffffff" }, errorCorrectionLevel: "L", margin: 0 } },
-    { label: "Orange",        opts: { color: { dark: "#d9480f", light: "#fff4e6" }, errorCorrectionLevel: "Q", margin: 1 } },
+    { label: "Classic",       dark: "#000000", light: "#ffffff", ec: "M", margin: 2 },
+    { label: "Blue",          dark: "#1a73e8", light: "#ffffff", ec: "M", margin: 1 },
+    { label: "High contrast", dark: "#0d1117", light: "#f0f6fc", ec: "H", margin: 2 },
+    { label: "Dark green",    dark: "#1a7f37", light: "#ffffff", ec: "Q", margin: 1 },
+    { label: "Purple",        dark: "#6f42c1", light: "#faf5ff", ec: "M", margin: 1 },
+    { label: "Red",           dark: "#cf222e", light: "#fff5f5", ec: "H", margin: 2 },
+    { label: "Minimal",       dark: "#111111", light: "#ffffff", ec: "L", margin: 0 },
+    { label: "Orange",        dark: "#d9480f", light: "#fff4e6", ec: "Q", margin: 1 },
   ];
+
+  // Render one QR into a hidden div using qrcodejs, then grab the canvas
+  function renderQRToCanvas(text, design) {
+    return new Promise(function (resolve, reject) {
+      const holder = document.createElement("div");
+      holder.style.position = "fixed";
+      holder.style.left = "-99999px";
+      holder.style.top = "0";
+      document.body.appendChild(holder);
+
+      let qr;
+      try {
+        qr = new QRCode(holder, {
+          text: text,
+          width: 300,
+          height: 300,
+          colorDark: design.dark,
+          colorLight: design.light,
+          correctLevel: QRCode.CorrectLevel[design.ec] || QRCode.CorrectLevel.M,
+        });
+      } catch (e) {
+        document.body.removeChild(holder);
+        return reject(e);
+      }
+
+      // qrcodejs renders either an <img> or a <canvas> depending on browser.
+      // We wait a tick for it to finish, then grab whichever exists.
+      setTimeout(function () {
+        try {
+          let sourceCanvas = null;
+          const canvasEl = holder.querySelector("canvas");
+          const imgEl = holder.querySelector("img");
+
+          if (canvasEl) {
+            sourceCanvas = canvasEl;
+          } else if (imgEl && imgEl.src) {
+            // Draw the img into a canvas
+            const c = document.createElement("canvas");
+            c.width = imgEl.width || 300;
+            c.height = imgEl.height || 300;
+            const ctx = c.getContext("2d");
+            ctx.fillStyle = design.light;
+            ctx.fillRect(0, 0, c.width, c.height);
+            ctx.drawImage(imgEl, 0, 0, c.width, c.height);
+            sourceCanvas = c;
+          }
+
+          if (!sourceCanvas) {
+            document.body.removeChild(holder);
+            return reject(new Error("QR library produced no canvas/img for " + design.label));
+          }
+
+          // Normalize to a fresh 300x300 canvas with margin applied
+          const final = document.createElement("canvas");
+          const qrPx = 300;
+          const margin = design.margin || 0;
+          // qrcodejs already includes no margin by default — add quiet zone manually
+          const total = qrPx + margin * 2 * 10; // 10px per unit of margin (units are modules ~ approximated)
+          const dim = Math.max(qrPx, total);
+          final.width = dim;
+          final.height = dim;
+          const fctx = final.getContext("2d");
+          fctx.fillStyle = design.light;
+          fctx.fillRect(0, 0, dim, dim);
+          const offset = (dim - qrPx) / 2;
+          fctx.drawImage(sourceCanvas, offset, offset, qrPx, qrPx);
+
+          document.body.removeChild(holder);
+          resolve(final);
+        } catch (err) {
+          if (holder.parentNode) document.body.removeChild(holder);
+          reject(err);
+        }
+      }, 60);
+    });
+  }
 
   async function renderGrid(url) {
     if (!url || url.trim() === "") {
       showError("Please enter a URL or text.");
       return;
     }
+    if (isRendering) return;
+    isRendering = true;
+
     clearError();
     setStatus("Generating " + designs.length + " QR designs…");
     downloadBtn.disabled = true;
     downloadSingle.disabled = true;
     generateBtn.disabled = true;
 
-    // clear old grid
     gridWrap.innerHTML = "";
     qrCanvases = [];
 
-    // We need a temporary hidden container to render canvases
-    const tempDiv = document.createElement("div");
-    tempDiv.style.position = "fixed";
-    tempDiv.style.left = "-9999px";
-    tempDiv.style.top = "0";
-    document.body.appendChild(tempDiv);
-
     try {
-      // Render each design
       for (let i = 0; i < designs.length; i++) {
         const d = designs[i];
-        const canvas = document.createElement("canvas");
-        // Append to tempDiv so qrcode.js can draw (it doesn't require DOM attachment, but safe)
-        tempDiv.appendChild(canvas);
+        const finalCanvas = await renderQRToCanvas(url, d);
 
-        await new Promise((resolve, reject) => {
-          QRCode.toCanvas(canvas, url, {
-            width: 300,
-            margin: d.opts.margin ?? 2,
-            color: d.opts.color,
-            errorCorrectionLevel: d.opts.errorCorrectionLevel || "M"
-          }, function (err) {
-            if (err) reject(err);
-            else resolve();
-          });
-        });
-
-        // Create card
+        // Card
         const card = document.createElement("div");
         card.className = "qr-card";
 
-        // Clone the canvas for display (so we can keep original for download)
-        const displayCanvas = document.createElement("canvas");
-        displayCanvas.width = canvas.width;
-        displayCanvas.height = canvas.height;
-        const ctx = displayCanvas.getContext("2d");
-        ctx.drawImage(canvas, 0, 0);
+        const qrHolder = document.createElement("div");
+        qrHolder.className = "qr-holder";
 
-        card.appendChild(displayCanvas);
+        // Display a copy so the original stays pristine
+        const display = document.createElement("canvas");
+        display.width = finalCanvas.width;
+        display.height = finalCanvas.height;
+        display.getContext("2d").drawImage(finalCanvas, 0, 0);
+        qrHolder.appendChild(display);
+        card.appendChild(qrHolder);
 
         const lbl = document.createElement("div");
         lbl.className = "label";
@@ -463,16 +382,8 @@
 
         gridWrap.appendChild(card);
 
-        // Store the original canvas for download
-        qrCanvases.push({
-          canvas: canvas,        // original canvas
-          label: d.label,
-          design: d,
-        });
+        qrCanvases.push({ canvas: finalCanvas, label: d.label, design: d });
       }
-
-      // cleanup temp
-      document.body.removeChild(tempDiv);
 
       downloadBtn.disabled = false;
       downloadSingle.disabled = false;
@@ -480,15 +391,14 @@
       currentUrl = url;
     } catch (err) {
       console.error(err);
-      showError("Failed to generate QR codes: " + (err.message || err));
+      showError("Failed to generate QR codes: " + (err && err.message ? err.message : String(err)));
       setStatus("");
-      if (tempDiv.parentNode) tempDiv.parentNode.removeChild(tempDiv);
     } finally {
       generateBtn.disabled = false;
+      isRendering = false;
     }
   }
 
-  // ----- Download combined grid as PNG -----
   function downloadGrid() {
     if (!qrCanvases.length) {
       showError("No QR codes to download. Generate a grid first.");
@@ -497,27 +407,18 @@
     clearError();
     setStatus("Composing grid PNG…");
 
-    // Decide grid layout: we want a nice square-ish grid.
-    // 8 designs → 4 cols × 2 rows, or 3 cols × 3 rows (with one empty)
     const count = qrCanvases.length;
-    let cols = Math.ceil(Math.sqrt(count));
-    let rows = Math.ceil(count / cols);
-    // For 8 designs, sqrt(8) ~ 2.8 → cols=3, rows=3 → nice. 
-    // But let's use cols = 4 for 8, or maybe 3. We'll use cols = Math.min(4, Math.ceil(Math.sqrt(count))) 
-    // Actually for 8, 4x2 looks good. Let's do:
-    if (count === 8) { cols = 4; rows = 2; }
-    else if (count <= 4) { cols = 2; rows = 2; }
+    let cols = 4, rows = 2;
+    if (count <= 4) { cols = 2; rows = 2; }
     else if (count <= 6) { cols = 3; rows = 2; }
     else { cols = 4; rows = Math.ceil(count / cols); }
 
-    // Determine cell size: we want each QR to be 300x300 as rendered, plus padding and label space
-    const qrSize = 300;          // each canvas is 300x300
-    const padding = 24;          // outer padding of the whole image
-    const cellPad = 12;          // padding inside each cell
-    const labelHeight = 22;      // space for label text
+    const qrSize = 300;
+    const padding = 24;
+    const cellPad = 12;
+    const labelHeight = 22;
     const cellWidth = qrSize + cellPad * 2;
     const cellHeight = qrSize + labelHeight + cellPad * 2;
-
     const totalWidth = padding * 2 + cols * cellWidth;
     const totalHeight = padding * 2 + rows * cellHeight;
 
@@ -526,11 +427,9 @@
     outCanvas.height = totalHeight;
     const ctx = outCanvas.getContext("2d");
 
-    // Fill background (light gray/white depending on theme? We'll use white always for better print)
     ctx.fillStyle = "#ffffff";
     ctx.fillRect(0, 0, totalWidth, totalHeight);
 
-    // Draw each QR
     for (let i = 0; i < count; i++) {
       const item = qrCanvases[i];
       const col = i % cols;
@@ -538,25 +437,17 @@
       const x = padding + col * cellWidth + cellPad;
       const y = padding + row * cellHeight + cellPad;
 
-      // Draw QR canvas
       ctx.drawImage(item.canvas, x, y, qrSize, qrSize);
 
-      // Draw label
       ctx.fillStyle = "#444444";
       ctx.font = "bold 14px 'Segoe UI', system-ui, -apple-system, sans-serif";
       ctx.textAlign = "center";
       ctx.textBaseline = "top";
-      const labelX = x + qrSize / 2;
-      const labelY = y + qrSize + 6;
-      ctx.fillText(item.label, labelX, labelY);
+      ctx.fillText(item.label, x + qrSize / 2, y + qrSize + 6);
     }
 
-    // Trigger download
     outCanvas.toBlob(function (blob) {
-      if (!blob) {
-        showError("Could not create PNG blob.");
-        return;
-      }
+      if (!blob) { showError("Could not create PNG blob."); return; }
       const filename = safeFilenameFromUrl(currentUrl || "qrcode-grid");
       const blobUrl = URL.createObjectURL(blob);
       const a = document.createElement("a");
@@ -570,7 +461,6 @@
     }, "image/png");
   }
 
-  // ----- Download first QR only (bonus) -----
   function downloadSingleQR() {
     if (!qrCanvases.length) {
       showError("No QR codes to download. Generate a grid first.");
@@ -578,7 +468,7 @@
     }
     clearError();
     const first = qrCanvases[0];
-    const filename = safeFilenameFromUrl(currentUrl || "qrcode") + "-single.png";
+    const filename = safeFilenameFromUrl(currentUrl || "qrcode").replace(/\.png$/, "") + "-single.png";
     first.canvas.toBlob(function (blob) {
       if (!blob) { showError("Could not create PNG."); return; }
       const blobUrl = URL.createObjectURL(blob);
@@ -593,13 +483,9 @@
     }, "image/png");
   }
 
-  // ----- clear grid -----
   function clearGrid() {
-    gridWrap.innerHTML = `
-      <div class="empty-state">
-        <strong>Enter a URL</strong> and press <strong>Generate QR grid</strong> to see multiple designs.
-      </div>
-    `;
+    gridWrap.innerHTML =
+      '<div class="empty-state"><strong>Enter a URL</strong> and press <strong>Generate QR grid</strong> to see multiple designs.</div>';
     qrCanvases = [];
     currentUrl = "";
     downloadBtn.disabled = true;
@@ -609,40 +495,27 @@
     urlInput.value = "https://github.com/igiteam/qrcode";
   }
 
-  // ----- event listeners -----
   generateBtn.addEventListener("click", function () {
     const url = urlInput.value.trim();
-    if (!url) {
-      showError("Please enter a URL or text.");
-      return;
-    }
+    if (!url) { showError("Please enter a URL or text."); return; }
     renderGrid(url);
   });
 
   urlInput.addEventListener("keydown", function (e) {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      generateBtn.click();
-    }
+    if (e.key === "Enter") { e.preventDefault(); generateBtn.click(); }
   });
 
   downloadBtn.addEventListener("click", downloadGrid);
   downloadSingle.addEventListener("click", downloadSingleQR);
   clearBtn.addEventListener("click", clearGrid);
 
-  // auto-generate on load with default URL
   window.addEventListener("load", function () {
-    // small delay to ensure QRCode library is ready
     setTimeout(function () {
-      if (urlInput.value.trim()) {
-        renderGrid(urlInput.value.trim());
-      }
-    }, 150);
+      if (urlInput.value.trim()) renderGrid(urlInput.value.trim());
+    }, 200);
   });
 
-  // expose for debugging (optional)
   window.__qrGrid = { renderGrid, downloadGrid, safeFilenameFromUrl };
-
 })();
 </script>
 </body>
